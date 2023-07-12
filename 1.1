@@ -1,0 +1,124 @@
+#exercise 1.1
+
+put all these things in the terminal
+
+# exercise 1.2
+(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5))))) (* 3 (- 6 2) (- 2 7)))
+
+#exercise 1.3
+
+(define (bigIt x y z)
+    (cond ((and (> x y) (> y z)) (sum-of-squares x y))
+          ((and (> x y) (> z y)) (sum-of-squares x z))
+          ((and (> y x) (> z x)) (sum-of-squares y z))
+          ))
+
+#exercise 1.4
+
+subexpressions are evaluated first.
+the innermost subexpression is the if statement,
+(if (> b 0) + -). if b is greater than 0, the if statement will return
+the character +, which is the addition operator. a will be added to b
+if b is less than zero, the if statement will return the character -,
+which is the subtraction operator. a will be subtracted from b. since
+b is a negative number, this would be the same as a + abs (b)
+
+#exercise 1.5
+
+Ben should observe the same behavior. The only inner operand to be evaluated
+is the one associated with the if special form, which is always evaluated
+first.
+
+Nope! for the applicative order method, the first thing you're gonna see is
+(test 0 (p)). Applicative order interpreters aren't gonna move on until they
+evaluate (p), which just evaluates to (p), which goes on and on recursively
+and the interpreter doesn't stop.
+
+For normal order evaluation, the special rule kicks in before (p) has to be
+evaluated, so no recursion problem.
+
+#exercise 1.6
+
+
+The program keeps running, but I have no idea why. If the program keeps running,
+that means the first condition is always evaluating as false.
+
+NOPE! It evaluates the else clause at the same time, making it recur forever????
+
+because it's a FUNCTION CALL. in scheme, arguments are FULLY evaluated before
+the procedure gets called up. so sqrt-iter keeps getting called over and forever
+and doesn't ever get resolved.
+
+if statements protect against that, and don't evaluate until a predicate.
+
+#exercise 1.7
+
+small numbers-- "0.0001" difference isn't great if, say, you're trying to
+calculate the square root of 0.0001
+
+(sqrt 0.001)
+0.04124542607499115
+
+1^2 - 0.0000000001 < 0.001
+
+
+
+
+when you have numbers smaller than the cutoff, obviously doesn't work.
+
+
+
+for REALLY big numbers, you end up running out of digits and the thing just
+approximates to scientific notation
+
+e.g
+
+(sqrt 100000000000000000000000000000000.0)
+1e+16
+
+
+BETTER SQRT-ITER
+
+(define (sqrt-iter guess last-guess x)
+  (if (good-enough? guess last-guess)
+      guess
+      (sqrt-iter (improve guess x) guess x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess last-guess)
+  (< (abs (- guess last-guess)) (* 0.001 guess)))
+
+(define (sqrt x)
+  (sqrt-iter (improve 1.0 x) 1.0 x))
+
+yeah, definitely more accurate on smaller numbers, which makes sense. not really 
+sure why it also works on larger numbers.
+
+# exercise 1.8
+
+(define (square x)
+  (* x x))
+
+(define (cube x)
+  ( * x x x))
+
+(define (cube-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (cube-iter (improve guess x) x)))
+
+(define (good-enough? guess x)
+  (< (abs (- (cube guess) x)) 0.001))
+
+(define (improve guess x)
+  (/ (+ (/ x (square guess)) (* 2 guess)) 3))
+
+
+
+(define (crt x)
+  (cube-iter 1.0 x))
